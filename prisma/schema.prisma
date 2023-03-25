@@ -5,6 +5,10 @@ generator client {
     provider = "prisma-client-js"
 }
 
+generator erd {
+  provider = "prisma-erd-generator"
+}
+
 datasource db {
     provider = "postgresql"
     // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
@@ -55,6 +59,7 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+    topics   Topic[]
 }
 
 model VerificationToken {
@@ -63,4 +68,23 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+model Topic {
+    id String    @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    title String
+    userId String
+    user User @relation(fields: [userId], references: [id])
+    notes Note[]
+}
+
+model Note {
+    id    String    @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    title String
+    content String
+    topic Topic  @relation(fields: [topicId], references: [id])
+    topicId String
 }
