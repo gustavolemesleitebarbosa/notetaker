@@ -179,7 +179,7 @@ const Content: React.FC = () => {
                       </a>
                     </li>
                   ))}
-                </ul> : <>  {sessionStatus === 'unauthenticated' ? 'Please SIGN IN to see user saved topics  ' : 'Loading topics...'}</>
+                </ul> : <>  {  'Loading topics...'}</>
               }
               <div className="divider"></div>
               <input
