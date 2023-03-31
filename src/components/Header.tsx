@@ -1,17 +1,19 @@
 import { signIn, signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
+import { type Props } from '~/pages'
 
-export const Header = () => {
+export const Header : React.FC <Props> = ({ session}: Props) => {
   const { data: sessionData, status: sessionStatus } = useSession()
-  if (sessionStatus === 'loading') return <div className='navbar bg-primary text-primary-content'> Loading...</div>
+  const userSession = sessionData?? session
+  if (sessionStatus === 'loading' && !userSession) return <div className='navbar bg-primary text-primary-content'> Loading...</div>
   return (
     <div className='navbar bg-primary text-primary-content'>
       <div className="flex-1 pl-5 text-3xl font-bold">
-        {sessionData?.user?.name ? `Notes from ${sessionData.user.name}` : ""}
+        {userSession?.user?.name ? `Notes from ${userSession.user.name}` : ""}
       </div>
       <div className='dropdown-end dropdown'>
         {
-          sessionData?.user ? (<div onClick={() => void signOut()} className='flex justify-center items-center cursor-pointer'>
+          userSession?.user ? (<div onClick={() => void signOut()} className='flex justify-center items-center cursor-pointer'>
             <div className='mr-2 text-lg'> Sign out</div>
             <label
               tabIndex={0}
@@ -19,8 +21,8 @@ export const Header = () => {
             >
               <div className='flex w-10 rounded-full'>
                 <Image
-                  src={sessionData?.user.image ?? ""}
-                  alt={sessionData?.user.name ?? ""}
+                  src={userSession?.user.image ?? ""}
+                  alt={userSession?.user.name ?? ""}
                   width={199}
                   height={990}
                 />

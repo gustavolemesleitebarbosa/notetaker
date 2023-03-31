@@ -1,22 +1,35 @@
-import { type NextPage } from "next";
+import { type NextPage } from 'next';
+import type { Session } from 'next-auth';
+import { getServerSession } from "next-auth/next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
-import React, { useState, type CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
+import { authOptions } from "~/server/auth";
 import { api, type RouterOutputs } from "~/utils/api";
 
-import { useQueryClient } from "@tanstack/react-query";
+
+import { useQueryClient } from '@tanstack/react-query';
 import { getQueryKey } from '@trpc/react-query';
+import { type GetServerSidePropsContext } from 'next';
+import { signIn } from 'next-auth/react';
 import ClipLoader from "react-spinners/ClipLoader";
 import { Header } from "~/components/Header";
-import NoteCard from "~/components/NoteCard";
-import NoteEditor from "~/components/NoteEditor";
+import { generateSSGHelper } from '~/server/helpers/ssgHelper';
+import NoteCard from "../components/NoteCard";
+import NoteEditor from "../components/NoteEditor";
+
 
 const override: CSSProperties = {
 
   borderColor: "blue",
 };
+type Note = RouterOutputs["note"]["getAll"][0]
 
-const Home: NextPage = () => {
+export type Props ={
+  session: Session| null
+}
+
+const Home: NextPage<Props> = ({session} : Props) => {
   return (
     <>
       <Head>
@@ -25,8 +38,8 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Header />
-        <Content />
+        <Header session/>
+        <Content  />
       </main>
     </>
   );
@@ -37,10 +50,9 @@ export default Home;
 const Content: React.FC = () => {
 
   type Topic = RouterOutputs["topic"]["getAll"][0]
-  type Note = RouterOutputs["note"]["getAll"][0]
 
   const { data: sessionData, status: sessionStatus } = useSession()
-  const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null)
+  const [selectedTopic, setSelectedTopic] = useState<Topic | null>()
 
   const { data: topics, refetch: refetchTopics, isLoading } = api.topic.getAll.useQuery(
     undefined,
@@ -79,8 +91,8 @@ const Content: React.FC = () => {
   })
 
   const { data: notes, refetch: refetchNotes } = api.note.getAll.useQuery(
-    { topicId: selectedTopic?.id ?? "" },
-    { enabled: sessionData?.user !== undefined && selectedTopic !== null }
+    { topicId: selectedTopic?.id ?? topics?.[0]?.id ?? "" },
+    { enabled: sessionData?.user !== undefined }
   )
 
   const notesListKey = getQueryKey(api.note.getAll, { topicId: selectedTopic?.id ?? "" }, 'query');
@@ -134,11 +146,18 @@ const Content: React.FC = () => {
     }
   })
 
+  if(sessionStatus === 'unauthenticated'){
+    return <button  onClick={() => void signIn()} className="flex items-center justify-center col-span-4 w-full h-[80vh] text-4xl">
+      Please sign in
+    </button>
+  }
+   
   return (
     <div className="mx-5 mt-5 grid grid-cols-4 gap-2">
       {
-        sessionStatus === 'loading' ?
+        !topics  ?
           <div className="flex items-center justify-center col-span-4 h-[80vh]">
+            
             <ClipLoader
               color={"##0679FE"}
               loading={true}
@@ -160,7 +179,7 @@ const Content: React.FC = () => {
                       </a>
                     </li>
                   ))}
-                </ul> : <>  {sessionStatus === 'unauthenticated' ? 'Please SIGN IN to see user saved topics  ' :  'Loading topics...'}</>
+                </ul> : <>  {sessionStatus === 'unauthenticated' ? 'Please SIGN IN to see user saved topics  ' : 'Loading topics...'}</>
               }
               <div className="divider"></div>
               <input
@@ -203,3 +222,35 @@ const Content: React.FC = () => {
     </div>
   )
 }
+
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const session = await getServerSession(context.req, context.res, authOptions)
+  const ssg = generateSSGHelper(session);
+  // const id = context.params?.id as string;
+  /*
+   * Prefetching the `post.byId` query here.
+   * `prefetch` does not return the result and never throws - if you need that behavior, use `fetch` instead.
+   */
+  let notes = null
+  if (session) {
+    const topics = await ssg.topic.getAll.fetch();
+    if (topics.length && topics[0]) {
+      notes = await ssg.note.getAll.fetch({ topicId: topics[0].id });
+      // Make sure to return { props: { trpcState: ssg.dehydrate() } }
+      notes = notes.map(note => ({
+        ...note,
+        createdAt: note.createdAt.toISOString(),
+        updatedAt: note.updatedAt.toISOString()
+      }));
+    }
+  }
+
+  return {
+    props: {
+      trpcState: ssg.dehydrate(),
+      session
+    },
+  };
+}
+
