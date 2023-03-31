@@ -38,7 +38,7 @@ const Home: NextPage<Props> = ({session} : Props) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Header session/>
+        <Header session ={session}/>
         <Content  />
       </main>
     </>
