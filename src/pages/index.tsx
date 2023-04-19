@@ -189,7 +189,7 @@ const Content: React.FC = () => {
         <div className="divider"></div>
         <div className="relative">
           <div className="relative left-4 top-10">
-            {topics && topics.length === 0 && inputContent === "" && (
+            { topics?.length === 0  && inputContent === "" && (
               <span className="absolute flex w-8 h-8 right-0 bottom-7 z-1900">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
                 <span className="relative top-2 left-2 inline-flex rounded-full h-4 w-4 bg-sky-500"></span>
@@ -245,7 +245,7 @@ const Content: React.FC = () => {
           <div className="w-full h-[35vh] flex flex-col flex-wrap justify-center items-center text-4xl">
             <div className="mb-5 text-center">You have no topics yet.😔</div>
             <div className="text-center mb-5">
-              Please enter your first topic on the input on the left
+              Please enter your first topic on the input 
             </div>
           </div>
         </div>
