@@ -8,7 +8,7 @@ export const Header : React.FC <Props> = ({ session}: Props) => {
   if (sessionStatus === 'loading' && !userSession) return <div className='navbar bg-primary text-primary-content'> Loading...</div>
   return (
     <div className='navbar bg-primary text-primary-content'>
-      <div className="flex-1 pl-5 text-3xl font-bold">
+      <div className="flex-1 pl-5 md:text-3xl lg:text-3xl font-bold">
         {userSession?.user?.name ? `Notes from ${userSession.user.name}` : ""}
       </div>
       <div className='dropdown-end dropdown'>
