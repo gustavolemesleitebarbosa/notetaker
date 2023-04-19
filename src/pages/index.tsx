@@ -242,7 +242,7 @@ const Content: React.FC = () => {
         </div>
       ) : (
         <div className="md:col-span-3 text-align: center">
-          <div className="w-full h-[35vh] flex flex-col flex-wrap justify-center items-center text-4xl">
+          <div className="w-full h-[35vh] flex flex-col flex-wrap justify-center items-center md:text-4xl lg:text-4xl">
             <div className="mb-5 text-center">You have no topics yet.😔</div>
             <div className="text-center mb-5">
               Please enter your first topic on the input 
