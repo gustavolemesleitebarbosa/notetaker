@@ -12,7 +12,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { getQueryKey } from '@trpc/react-query';
 import { type GetServerSidePropsContext } from 'next';
 import { signIn } from 'next-auth/react';
-import ClipLoader from "react-spinners/ClipLoader";
 import { Header } from "~/components/Header";
 import { generateSSGHelper } from '~/server/helpers/ssgHelper';
 import NoteCard from "../components/NoteCard";
@@ -158,7 +157,7 @@ const Content: React.FC = () => {
       inputRef.current.focus();
     }
   }, [topics, inputRef]);
-  
+
   if (sessionStatus === 'unauthenticated') {
     return <button onClick={() => void signIn()} className="flex items-center justify-center col-span-4 w-full h-[80vh] text-4xl">
       Please sign in
@@ -166,95 +165,91 @@ const Content: React.FC = () => {
   }
 
   return (
-    <div className="mx-5 mt-5 grid grid-cols-4 gap-2">
-      {
-        !topics ?
-          <div className="flex items-center justify-center col-span-4 h-[80vh]">
-
-            <ClipLoader
-              color={"##0679FE"}
-              loading={true}
-              cssOverride={override}
-              size={150}
-            />
-          </div> :
-          <>
-            <div className="px-2">
-              {!isLoading && topics ?
-                <ul className="menu rounded-box w-56 bg-base-100 p-2">
-                  {topics?.map((topic) => (
-                    <li key={topic.id}>
-                      <a href="#" onClick={(evt) => {
-                        evt.preventDefault();
-                        setSelectedTopic(topic)
-                      }}>
-                        {topic.title}
-                      </a>
-                    </li>
-                  ))}
-                </ul> : <>  {'Loading topics...'}</>
-              }
-              <div className="divider"></div>
-    
-              <div className='relative'>
-              <div className='relative left-4 top-10'>
-              {topics.length === 0 && inputContent === "" &&
-              <span className="absolute flex w-8 h-8 right-0 bottom-7 z-1900 ">
+    <div className="mx-5 mt-5 grid grid-cols-1 md:grid-cols-4 gap-2">
+      <div className="md:col-span-1 px-2">
+        {!isLoading && topics ? (
+          <ul className="menu rounded-box w-56 bg-base-100 p-2">
+            {topics.map((topic) => (
+              <li key={topic.id}>
+                <a
+                  href="#"
+                  onClick={(evt) => {
+                    evt.preventDefault();
+                    setSelectedTopic(topic);
+                  }}
+                >
+                  {topic.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <>{'Loading topics...'}</>
+        )}
+        <div className="divider"></div>
+        <div className="relative">
+          <div className="relative left-4 top-10">
+            {topics.length === 0 && inputContent === "" && (
+              <span className="absolute flex w-8 h-8 right-0 bottom-7 z-1900">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
                 <span className="relative top-2 left-2 inline-flex rounded-full h-4 w-4 bg-sky-500"></span>
-              </span>}
-              </div>
-                <input
-                  type="text"
-                  placeholder="New Topic"
-                  ref={inputRef}
-                  onChange={(e) => { setInputContent(e.target.value) }}
-                  className={`input-bordered input input-sm w-full ${topics.length === 0 && inputContent === "" ? "border-black-500  " : ""} `}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      createTopic.mutate({
-                        title: e.currentTarget.value,
-                      })
-                      e.currentTarget.value = ""
-                    }
-                  }}
+              </span>
+            )}
+          </div>
+          <input
+            type="text"
+            placeholder="New Topic"
+            ref={inputRef}
+            onChange={(e) => {
+              setInputContent(e.target.value);
+            }}
+            className={`input-bordered input input-sm w-full ${topics?.length === 0 && inputContent === ""
+                ? "border-black-500"
+                : ""
+              }`}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                createTopic.mutate({
+                  title: e.currentTarget.value,
+                });
+                e.currentTarget.value = "";
+              }
+            }}
+          />
+        </div>
+      </div>
+      {topics?.length > 0 ? (
+        <div className="md:col-span-3">
+          <div>
+            {notes?.map((note) => (
+              <div key={note.id} className="mt-5">
+                <NoteCard
+                  note={note}
+                  onDelete={() => void deleteNote.mutate({ id: note.id })}
                 />
               </div>
+            ))}
+          </div>
+          <NoteEditor
+            onSave={({ title, content }) => {
+              void createNote.mutate({
+                title,
+                content,
+                topicId: selectedTopic?.id ?? "",
+              });
+            }}
+          />
+        </div>
+      ) : (
+        <div className="md:col-span-3 text-align: center">
+          <div className="w-full h-[35vh] flex flex-col flex-wrap justify-center items-center text-4xl">
+            <div className="mb-5 text-center">You have no topics yet.😔</div>
+            <div className="text-center mb-5">
+              Please enter your first topic on the input on the left
             </div>
-            {topics.length > 0 ? <div className="col-span-3">
-              <div>
-                {notes?.map((note) => (
-                  <div key={note.id} className=" mt-5">
-                    <NoteCard
-                      note={note}
-                      onDelete={() => void deleteNote.mutate({ id: note.id })}
-                    />
-                  </div>
-                ))}
-              </div>
-              <NoteEditor
-                onSave={({ title, content }) => {
-                  void createNote.mutate({
-                    title,
-                    content,
-                    topicId: selectedTopic?.id ?? "",
-                  })
-                }}
-              />
-            </div> :
-              <div className="col-span-3 text-align: center">
-                <div className="w-full h-[35vh] flex flex-col flex-wrap justify-center items-center text-4xl ">
-                  <div className='mb-5 text-center' >
-                    You have no topics yet.😔
-                  </div>
-                  <div className='text-center mb-5' >
-                    Please enter your first topic on the input on the left
-                  </div>
-                </div>
-              </div>
-            }
-          </>
-      }
+          </div>
+        </div>
+      )}
     </div>
   )
 }
