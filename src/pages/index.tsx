@@ -218,7 +218,7 @@ const Content: React.FC = () => {
           />
         </div>
       </div>
-      {topics?.length > 0 ? (
+      {topics && topics?.length > 0 ? (
         <div className="md:col-span-3">
           <div>
             {notes?.map((note) => (
