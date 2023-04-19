@@ -89,7 +89,7 @@ const Content: React.FC = () => {
     onError: (_err, _newTopic, context) => {
       queryClient.setQueryData([topicsListKey], context?.previousTopics)
     },
-    onSettled(_err, newTopic) {
+    onSettled(_err) {
       void refetchTopics()
     },
   })
@@ -150,14 +150,15 @@ const Content: React.FC = () => {
     }
   })
 
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (topics?.length === 0 && inputRef.current) {
-      inputRef.current?.focus();
+    if (topics?.length === 0 && inputRef?.current !== null) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      inputRef.current.focus();
     }
-  }, [topics]);
-
+  }, [topics, inputRef]);
+  
   if (sessionStatus === 'unauthenticated') {
     return <button onClick={() => void signIn()} className="flex items-center justify-center col-span-4 w-full h-[80vh] text-4xl">
       Please sign in
