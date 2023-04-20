@@ -168,21 +168,28 @@ const Content: React.FC = () => {
     <div className="mx-5 mt-5 grid grid-cols-1 md:grid-cols-4 gap-2">
       <div className="md:col-span-1 px-2">
         {!isLoading && topics ? (
-          <ul className="menu rounded-box w-56 bg-base-100 p-2">
-            {topics.map((topic) => (
-              <li key={topic.id}>
-                <a
-                  href="#"
-                  onClick={(evt) => {
-                    evt.preventDefault();
-                    setSelectedTopic(topic);
-                  }}
-                >
-                  {topic.title}
-                </a>
-              </li>
-            ))}
-          </ul>
+             <ul className="menu rounded-box w-56 bg-base-100 p-2">
+             {
+ 
+               topics.map((topic) => {
+                 const isSelected = topic.id === selectedTopic?.id
+                 return (
+                   <li key={topic.id}>
+                     <a
+                       className={`${isSelected ? 'bg-sky-100' : ''}`}
+                       href="#"
+                       onClick={(evt) => {
+                         evt.preventDefault();
+                         setSelectedTopic(topic);
+                       }}
+                     >
+                       {topic.title}
+                     </a>
+                   </li>)
+               }
+               )
+             }
+           </ul>
         ) : (
           <>{'Loading topics...'}</>
         )}
