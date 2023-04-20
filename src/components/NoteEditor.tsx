@@ -22,7 +22,7 @@ const NoteEditor = ({ onSave }: Props) => {
           />
         </h2>
         <CodeMirror
-          placeholder={"Type some markdown code  here..."}
+          placeholder={"Type some markdown code here..."}
           value={code}
           height="30vh"
           minWidth="100%"
