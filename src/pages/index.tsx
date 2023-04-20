@@ -156,7 +156,7 @@ const Content: React.FC = () => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       inputRef.current.focus();
     }
-  }, [topics, inputRef]);
+  }, [topics]);
 
   if (sessionStatus === 'unauthenticated') {
     return <button onClick={() => void signIn()} className="flex items-center justify-center col-span-4 w-full h-[80vh] text-4xl">
