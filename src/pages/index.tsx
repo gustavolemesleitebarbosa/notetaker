@@ -189,33 +189,50 @@ const Content: React.FC = () => {
         <div className="divider"></div>
         <div className="relative">
           <div className="relative left-4 top-10">
-            { topics?.length === 0  && inputContent === "" && (
+            {topics?.length === 0 && inputContent === "" && (
               <span className="absolute flex w-8 h-8 right-0 bottom-7 z-1900">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
                 <span className="relative top-2 left-2 inline-flex rounded-full h-4 w-4 bg-sky-500"></span>
               </span>
             )}
           </div>
-          <input
-            type="text"
-            placeholder="New Topic"
-            ref={inputRef}
-            onChange={(e) => {
-              setInputContent(e.target.value);
-            }}
-            className={`input-bordered input input-sm w-full ${topics?.length === 0 && inputContent === ""
+          <div className='flex'>
+            <input
+              type="text"
+              placeholder="New Topic"
+              ref={inputRef}
+              onChange={(e) => {
+                setInputContent(e.target.value);
+              }}
+              className={`input-bordered input input-md w-full ${topics?.length === 0 && inputContent === ""
                 ? "border-black-500"
                 : ""
-              }`}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                createTopic.mutate({
-                  title: e.currentTarget.value,
-                });
-                e.currentTarget.value = "";
+                }`}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  createTopic.mutate({
+                    title: e.currentTarget.value,
+                  });
+                  e.currentTarget.value = "";
+                }
               }
-            }}
-          />
+              }
+            />
+            <button
+              onClick={() => {
+                createTopic.mutate({
+                  title: inputContent,
+                });
+                if(inputRef?.current !== null){
+                   inputRef.current.value = "";
+                }
+              }}
+              className="btn-primary btn ml-2 h-2 md:hidden lg:hidden"
+              disabled={inputContent === ""}
+            >
+              Add
+            </button>
+          </div>
         </div>
       </div>
       {topics && topics?.length > 0 ? (
@@ -242,13 +259,13 @@ const Content: React.FC = () => {
         </div>
       ) : (
         <div className="md:col-span-3 text-align: center">
-          { topics?.length ===0 && inputContent ==='' &&
-          <div className="w-full h-[35vh] flex flex-col flex-wrap justify-center items-center md:text-4xl lg:text-4xl">
-            <div className="mb-5 text-center">You have no topics yet.😔</div>
-            <div className="text-center mb-5">
-              Please enter your first topic on the input 
+          {topics?.length === 0 && inputContent === '' &&
+            <div className="w-full h-[35vh] flex flex-col flex-wrap justify-center items-center md:text-4xl lg:text-4xl">
+              <div className="mb-5 text-center">You have no topics yet.😔</div>
+              <div className="text-center mb-5">
+                Please enter your first topic on the input
+              </div>
             </div>
-          </div>
           }
         </div>
       )}
