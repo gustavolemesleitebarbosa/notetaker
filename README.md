@@ -1,4 +1,4 @@
-This is a notetaker application that uses GithubOAUTH to deal with user authentication. To get it running make sure to add the required environemnt varibles to your .env file:
+This is a notetaker application that uses Github Oauth to deal with user authentication. To get it running make sure to add the required environemnt varibles to your .env file:
 
   DATABASE_URL: [ 'Required' ],
   NEXTAUTH_URL: [ 'Required' ],
